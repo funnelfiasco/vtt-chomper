@@ -1,14 +1,15 @@
+'''
+vtt-chomper: it chomps VTT files!
+'''
 import argparse
 import sys
 import webvtt
-
-from datetime import timedelta
 
 def timestamp_to_ms(timestamp):
     """Converts a VTT timestamp string (hh:mm:ss.mmm) to milliseconds."""
     hours, minutes, secondsWithMs = timestamp.split(":")
     seconds, milliseconds = secondsWithMs.split(".")
-    
+
     return (int(hours) * 3600 + int(minutes) * 60 + int(seconds)) * 1000 + int(milliseconds)
 
 def ms_to_timestamp(msTime):
@@ -17,9 +18,10 @@ def ms_to_timestamp(msTime):
     minutes, secMs = divmod(minSecMs, 60000)
     seconds, milliseconds = divmod(secMs, 1000)
 
-    return "{:02}:{:02}:{:02}.{:03}".format(int(hours), int(minutes), int(seconds), int(milliseconds))
+    return f"{hours:02}:{minutes:02}:{seconds:02}.{milliseconds:03}"
 
 def main():
+    '''This is where the magic happens.'''
 
     argparser = argparse.ArgumentParser(
         description='Trim the ends off of VTT files'
@@ -53,7 +55,7 @@ def main():
         type=int
     )
     options = argparser.parse_args()
-    
+
     # If both trims are zero, what exactly is it that you want me to do here?
     if options.trimBeginning == 0 and options.trimEnd == 0:
         print("No trimming requested. That was easy!")
@@ -75,7 +77,7 @@ def main():
             endStamp = ms_to_timestamp(timestamp_to_ms(caption.end) - (options.trimBeginning*1000))
 
             outVtt.captions.append(webvtt.Caption(startStamp, endStamp, caption.text))
-    
+
     outVtt.save(options.outputFile)
 
 if __name__ == '__main__':
