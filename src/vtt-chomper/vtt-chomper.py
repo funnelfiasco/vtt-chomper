@@ -3,8 +3,6 @@ import webvtt
 
 from datetime import timedelta
 
-START_SECONDS=492
-
 def timestamp_to_ms(timestamp):
     """Converts a VTT timestamp string (hh:mm:ss.mmm) to milliseconds."""
     hours, minutes, secondsWithMs = timestamp.split(":")
@@ -41,11 +39,12 @@ def main():
     # Trims
     argparser.add_argument(
         "-b", "--beginning",
-        dest="trimBefore",
+        dest="trimBeginning",
         help="Seconds to trim from the beginning",
         default=0,
         type=int
     )
+
     options = argparser.parse_args()
     
     inVtt = webvtt.read(options.inputFile)
@@ -53,9 +52,9 @@ def main():
 
     for caption in inVtt.captions:
         startTime = timestamp_to_ms(caption.start)
-        if startTime > (options.trimBefore * 1000):
-            startStamp = ms_to_timestamp(startTime - (START_SECONDS*1000))
-            endStamp = ms_to_timestamp(timestamp_to_ms(caption.end) - (START_SECONDS*1000))
+        if startTime > (options.trimBeginning * 1000):
+            startStamp = ms_to_timestamp(startTime - (options.trimBeginning*1000))
+            endStamp = ms_to_timestamp(timestamp_to_ms(caption.end) - (options.trimBeginning*1000))
 
             outVtt.captions.append(webvtt.Caption(startStamp, endStamp, caption.text))
     
