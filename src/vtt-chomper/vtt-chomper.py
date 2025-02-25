@@ -1,9 +1,8 @@
+import argparse
 import webvtt
 
 from datetime import timedelta
 
-INPUT_FILE="input.vtt"
-OUTPUT_FILE="output.vtt"
 START_SECONDS=492
 
 def timestamp_to_ms(timestamp):
@@ -15,7 +14,6 @@ def timestamp_to_ms(timestamp):
 
 def ms_to_timestamp(msTime):
     """Converts milliseconds to a VTT timestamp string (hh:mm:ss.mmm)"""
-    #return str(timedelta(seconds=msTime/1000))[:-3]
     hours, minSecMs = divmod(msTime, 3600000)
     minutes, secMs = divmod(minSecMs, 60000)
     seconds, milliseconds = divmod(secMs, 1000)
@@ -24,18 +22,44 @@ def ms_to_timestamp(msTime):
 
 def main():
 
-    inVtt = webvtt.read(INPUT_FILE)
+    argparser = argparse.ArgumentParser(
+        description='Trim the ends off of VTT files'
+        )
+    # Files
+    argparser.add_argument(
+        "-i", "--input",
+        dest="inputFile",
+        help="Input VTT file",
+        required=True
+    )
+    argparser.add_argument(
+        "-o", "--output",
+        dest="outputFile",
+        help="Output VTT file",
+        required=True
+    )
+    # Trims
+    argparser.add_argument(
+        "-b", "--beginning",
+        dest="trimBefore",
+        help="Seconds to trim from the beginning",
+        default=0,
+        type=int
+    )
+    options = argparser.parse_args()
+    
+    inVtt = webvtt.read(options.inputFile)
     outVtt = webvtt.WebVTT()
 
     for caption in inVtt.captions:
         startTime = timestamp_to_ms(caption.start)
-        if startTime > (START_SECONDS * 1000):
+        if startTime > (options.trimBefore * 1000):
             startStamp = ms_to_timestamp(startTime - (START_SECONDS*1000))
             endStamp = ms_to_timestamp(timestamp_to_ms(caption.end) - (START_SECONDS*1000))
 
             outVtt.captions.append(webvtt.Caption(startStamp, endStamp, caption.text))
     
-    outVtt.save(OUTPUT_FILE)
+    outVtt.save(options.outputFile)
 
 if __name__ == '__main__':
     main()  # pragma: no cover
