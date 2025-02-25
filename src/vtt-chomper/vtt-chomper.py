@@ -1,4 +1,5 @@
 import argparse
+import sys
 import webvtt
 
 from datetime import timedelta
@@ -44,15 +45,32 @@ def main():
         default=0,
         type=int
     )
-
+    argparser.add_argument(
+        "-e", "--end",
+        dest="trimEnd",
+        help="Seconds to trim from the end",
+        default=0,
+        type=int
+    )
     options = argparser.parse_args()
     
+    # If both trims are zero, what exactly is it that you want me to do here?
+    if options.trimBeginning == 0 and options.trimEnd == 0:
+        print("No trimming requested. That was easy!")
+        sys.exit(0)
+
     inVtt = webvtt.read(options.inputFile)
     outVtt = webvtt.WebVTT()
 
+    # If we're chomping off the back, check to see what the final timestamp is.
+    # If we're not chomping off the back, use the final timestamp as the
+    # chomping point.
+    lastTimestamp = timestamp_to_ms(inVtt.captions[-1].end) - (options.trimEnd * 1000)
+
     for caption in inVtt.captions:
         startTime = timestamp_to_ms(caption.start)
-        if startTime > (options.trimBeginning * 1000):
+        endTime = timestamp_to_ms(caption.end)
+        if startTime > (options.trimBeginning * 1000) and endTime <= lastTimestamp:
             startStamp = ms_to_timestamp(startTime - (options.trimBeginning*1000))
             endStamp = ms_to_timestamp(timestamp_to_ms(caption.end) - (options.trimBeginning*1000))
 
