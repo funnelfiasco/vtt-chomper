@@ -20,6 +20,20 @@ def ms_to_timestamp(msTime):
 
     return f"{hours:02}:{minutes:02}:{seconds:02}.{milliseconds:03}"
 
+def do_a_whimsy():
+    """Prints an ASCII art alligator. It's not that deep."""
+
+    print('     _    _')
+    print('____/ \\__/ \\____oo__')
+    print('    \\O/  \\O/        \\')
+    print('                    )')
+    print('-----VVVVVVVVVVVVVVV')
+    print('')
+    print('         VTT')
+    print('')
+    print('-----^^^^^^^^^^^^^^\\')
+    print('____________________)')
+
 def main():
     '''This is where the magic happens.'''
 
@@ -31,13 +45,13 @@ def main():
         "-i", "--input",
         dest="inputFile",
         help="Input VTT file",
-        required=True
+        default=0
     )
     argparser.add_argument(
         "-o", "--output",
         dest="outputFile",
         help="Output VTT file",
-        required=True
+        default=0
     )
     # Trims
     argparser.add_argument(
@@ -54,7 +68,18 @@ def main():
         default=0,
         type=int
     )
+    argparser.add_argument(
+        "--whimsy",
+        dest="whimsy",
+        help="Chomp!",
+        action='store_true'
+    )
     options = argparser.parse_args()
+
+    # Want to do a whismy?
+    if options.whimsy:
+        do_a_whimsy()
+        sys.exit(0)
 
     # If both trims are zero, what exactly is it that you want me to do here?
     if options.trimBeginning == 0 and options.trimEnd == 0:
