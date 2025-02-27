@@ -7,7 +7,7 @@ A simple tool for chomping the ends of a VTT file.
 Uploading a meeting video and want to get rid of the first 5 minutes where you're waiting for everyone to join?
 Use the `-b <SECONDS>` argument to chomp that many seconds off the beginning of the VTT file and update the time stamps accordingly.
 Want to trim off the end where everyone's just awkwardly saying goodbye to each other?
-use the `-e <SECONDS>` argument to chomp that many seconds off the end of the VTT file.
+use the `-e <SECONDS>` argument to chomp beyond that timestamp in the VTT file.
 Very tasty!
 
 ## Requirements

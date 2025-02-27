@@ -64,8 +64,8 @@ def main():
     argparser.add_argument(
         "-e", "--end",
         dest="trimEnd",
-        help="Seconds to trim from the end",
-        default=0,
+        help="Ending timestamp in seconds",
+        default=-1,
         type=int
     )
     argparser.add_argument(
@@ -89,10 +89,13 @@ def main():
     inVtt = webvtt.read(options.inputFile)
     outVtt = webvtt.WebVTT()
 
-    # If we're chomping off the back, check to see what the final timestamp is.
-    # If we're not chomping off the back, use the final timestamp as the
-    # chomping point.
-    lastTimestamp = timestamp_to_ms(inVtt.captions[-1].end) - (options.trimEnd * 1000)
+    # If we're chomping off the end, just use the value provided.
+    # If we're not chomping off the end, use the final timestamp as the
+    # comparison point for chomping.
+    if options.trimEnd == -1:
+        lastTimestamp = timestamp_to_ms(inVtt.captions[-1].end)
+    else:
+        lastTimestamp = options.trimEnd * 1000
 
     for caption in inVtt.captions:
         startTime = timestamp_to_ms(caption.start)
