@@ -76,7 +76,7 @@ def main():
     )
     options = argparser.parse_args()
 
-    # Want to do a whismy?
+    # Want to do a whimsy?
     if options.whimsy:
         do_a_whimsy()
         sys.exit(0)
