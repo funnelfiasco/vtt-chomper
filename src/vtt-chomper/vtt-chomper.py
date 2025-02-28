@@ -88,7 +88,7 @@ def main():
         sys.exit(0)
 
     # If both trims are zero, what exactly is it that you want me to do here?
-    if options.trimBeginning == 0 and options.trimEnd == 0:
+    if options.trimBeginning == 0 and options.trimEnd == -1:
         print("No trimming requested. That was easy!")
         sys.exit(0)
 
