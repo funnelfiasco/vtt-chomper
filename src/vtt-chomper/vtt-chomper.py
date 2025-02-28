@@ -90,7 +90,7 @@ def main():
     # If both trims are zero, what exactly is it that you want me to do here?
     if options.trimBeginning == 0 and options.trimEnd == -1:
         print("No trimming requested. That was easy!")
-        sys.exit(0)
+        sys.exit(1)
 
     try:
         inVtt = webvtt.read(options.inputFile)
