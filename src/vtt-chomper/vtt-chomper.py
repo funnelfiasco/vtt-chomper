@@ -34,8 +34,10 @@ def do_a_whimsy():
     print('-----^^^^^^^^^^^^^^\\')
     print('____________________)')
 
-def main():
-    '''This is where the magic happens.'''
+def get_options():
+    """Get the options
+        Returns: options <class 'argparse.Namespace'>
+    """
 
     argparser = argparse.ArgumentParser(
         description='Trim the ends off of VTT files'
@@ -72,7 +74,13 @@ def main():
         help="Chomp!",
         action='store_true'
     )
-    options = argparser.parse_args()
+
+    return argparser.parse_args()
+
+def main():
+    '''This is where the magic happens.'''
+
+    options = get_options()
 
     # Want to do a whimsy?
     if options.whimsy:
