@@ -77,6 +77,24 @@ def get_options():
 
     return argparser.parse_args()
 
+def chomp_it(inVtt,firstTimestamp, lastTimestamp):
+    """Does the chomping
+        Input: inVtt <class 'webvtt.webvtt.WebVTT'>
+        Output: outVtt <class 'webvtt.webvtt.WebVTT'>
+    """
+    outVtt = webvtt.WebVTT()
+
+    for caption in inVtt.captions:
+        startTime = timestamp_to_ms(caption.start)
+        endTime = timestamp_to_ms(caption.end)
+        if startTime > firstTimestamp and endTime <= lastTimestamp:
+            startStamp = ms_to_timestamp(startTime - firstTimestamp)
+            endStamp = ms_to_timestamp(timestamp_to_ms(caption.end) - firstTimestamp)
+
+            outVtt.captions.append(webvtt.Caption(startStamp, endStamp, caption.text))
+
+    return outVtt
+
 def main():
     '''This is where the magic happens.'''
 
@@ -86,11 +104,6 @@ def main():
     if options.whimsy:
         do_a_whimsy()
         sys.exit(0)
-
-    # If both trims are zero, what exactly is it that you want me to do here?
-    if options.trimBeginning == 0 and options.trimEnd == -1:
-        print("No trimming requested. That was easy!")
-        sys.exit(1)
 
     try:
         inVtt = webvtt.read(options.inputFile)
@@ -103,7 +116,6 @@ def main():
     except PermissionError:
         print(f"Permission denied for {options.inputFile}")
         sys.exit(1)
-    outVtt = webvtt.WebVTT()
 
     # If we're chomping off the end, just use the value provided.
     # If we're not chomping off the end, use the final timestamp as the
@@ -113,14 +125,16 @@ def main():
     else:
         lastTimestamp = options.trimEnd * 1000
 
-    for caption in inVtt.captions:
-        startTime = timestamp_to_ms(caption.start)
-        endTime = timestamp_to_ms(caption.end)
-        if startTime > (options.trimBeginning * 1000) and endTime <= lastTimestamp:
-            startStamp = ms_to_timestamp(startTime - (options.trimBeginning*1000))
-            endStamp = ms_to_timestamp(timestamp_to_ms(caption.end) - (options.trimBeginning*1000))
+    # If both trims are zero, what exactly is it that you want me to do here?
+    if options.trimBeginning == 0 and options.trimEnd == -1:
+        print("No trimming requested. That was easy!")
+        sys.exit(1)
+    elif lastTimestamp <= options.trimBeginning * 1000:
+        print("The end time can't be less than the start time. What are you doing?")
+        sys.exit(1)
 
-            outVtt.captions.append(webvtt.Caption(startStamp, endStamp, caption.text))
+    # Do the chomping!
+    outVtt = chomp_it(inVtt, options.trimBeginning * 1000, lastTimestamp)
 
     try:
         outVtt.save(options.outputFile)
