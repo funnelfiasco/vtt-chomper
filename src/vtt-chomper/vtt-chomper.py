@@ -44,14 +44,12 @@ def main():
     argparser.add_argument(
         "-i", "--input",
         dest="inputFile",
-        help="Input VTT file",
-        default=0
+        help="Input VTT file"
     )
     argparser.add_argument(
         "-o", "--output",
         dest="outputFile",
-        help="Output VTT file",
-        default=0
+        help="Output VTT file"
     )
     # Trims
     argparser.add_argument(
@@ -86,7 +84,17 @@ def main():
         print("No trimming requested. That was easy!")
         sys.exit(0)
 
-    inVtt = webvtt.read(options.inputFile)
+    try:
+        inVtt = webvtt.read(options.inputFile)
+    except TypeError:
+        print("You need to specify an input file, silly!")
+        sys.exit(1)
+    except FileNotFoundError:
+        print(f"Chompy could not find {options.inputFile}")
+        sys.exit(1)
+    except PermissionError:
+        print(f"Permission denied for {options.inputFile}")
+        sys.exit(1)
     outVtt = webvtt.WebVTT()
 
     # If we're chomping off the end, just use the value provided.
@@ -106,7 +114,17 @@ def main():
 
             outVtt.captions.append(webvtt.Caption(startStamp, endStamp, caption.text))
 
-    outVtt.save(options.outputFile)
+    try:
+        outVtt.save(options.outputFile)
+    except webvtt.errors.MissingFilenameError:
+        print("No output file specified!")
+        sys.exit(1)
+    except PermissionError:
+        print(f"Permission denied to {options.outputFile}")
+        sys.exit(1)
+    except FileNotFoundError:
+        print(f"Directory not found for {options.outputFile}")
+        sys.exit(1)
 
 if __name__ == '__main__':
     main()  # pragma: no cover
