@@ -65,7 +65,6 @@ def get_options():
         "-e", "--end",
         dest="trimEnd",
         help="Ending timestamp in seconds",
-        default=-1,
         type=int
     )
     argparser.add_argument(
@@ -120,17 +119,20 @@ def main():
     # If we're chomping off the end, just use the value provided.
     # If we're not chomping off the end, use the final timestamp as the
     # comparison point for chomping.
-    if options.trimEnd == -1:
-        lastTimestamp = timestamp_to_ms(inVtt.captions[-1].end)
-    else:
+    if options.trimEnd:
         lastTimestamp = options.trimEnd * 1000
+    else:
+        lastTimestamp = timestamp_to_ms(inVtt.captions[-1].end)
 
     # If both trims are zero, what exactly is it that you want me to do here?
-    if options.trimBeginning == 0 and options.trimEnd == -1:
+    if options.trimEnd and options.trimBeginning == options.trimEnd:
         print("No trimming requested. That was easy!")
         sys.exit(1)
     elif lastTimestamp <= options.trimBeginning * 1000:
         print("The end time can't be less than the start time. What are you doing?")
+        sys.exit(1)
+    elif options.trimBeginning < 0 or lastTimestamp <= 0:
+        print("I am not Huey Lewis, I cannot go back in time.")
         sys.exit(1)
 
     # Do the chomping!
