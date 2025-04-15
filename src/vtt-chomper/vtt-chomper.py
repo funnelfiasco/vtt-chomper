@@ -115,6 +115,9 @@ def main():
     except PermissionError:
         print(f"Permission denied for {options.inputFile}")
         sys.exit(1)
+    except UnicodeDecodeError:
+        print(f"Unicdode error for {options.inputFile}. Is this a vtt file?")
+        sys.exit(1)
 
     # If we're chomping off the end, just use the value provided.
     # If we're not chomping off the end, use the final timestamp as the
