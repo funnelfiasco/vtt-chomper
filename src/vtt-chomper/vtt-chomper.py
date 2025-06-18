@@ -1,5 +1,5 @@
 '''
-vtt-chomper: it chomps VTT files!
+vtt-chomper: it chomps VTT files! OH YEAH!
 '''
 import argparse
 import sys
