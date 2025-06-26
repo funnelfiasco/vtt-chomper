@@ -98,7 +98,7 @@ def validate_times(trimBeginning, trimEnd, lastTimestamp):
     '''Make sure the times that the user specified are reasonable.'''
 
     # If both trims are zero, what exactly is it that you want me to do here?
-    if trimEnd and trimBeginning == trimEnd:
+    if (trimEnd and trimBeginning == trimEnd) or (not trimBeginning and not trimEnd):
         print("No trimming requested. That was easy!")
         sys.exit(1)
     elif lastTimestamp <= trimBeginning * 1000:
