@@ -2,7 +2,9 @@
 vtt-chomper: it chomps VTT files!
 '''
 import argparse
+from datetime import datetime as dt
 import sys
+
 import webvtt
 
 def timestamp_to_ms(timestamp):
@@ -19,6 +21,29 @@ def ms_to_timestamp(msTime):
     seconds, milliseconds = divmod(secMs, 1000)
 
     return f"{hours:02}:{minutes:02}:{seconds:02}.{milliseconds:03}"
+
+def time_to_secs(timestamp):
+    '''Convert HH:MM:SS timestamps to seconds'''
+
+    if timestamp.isdigit():
+        return int(timestamp)
+
+    hours = minutes = seconds = "00"
+    if ":" in timestamp:
+        minutes, seconds = timestamp.rsplit(':', maxsplit=1)
+        if ":" in minutes:
+            hours, minutes = minutes.split(':')
+    else:
+        print(f"Timestamp {timestamp} not in seconds or HH:MM:SS")
+        sys.exit(1)
+
+    try:
+        timeSecs = dt.strptime(f"{hours}:{minutes}:{seconds}", "%H:%M:%S") - dt(1900,1,1)
+    except ValueError:
+        print(f"This does not look like a real timestamp: {timestamp}")
+        sys.exit(1)
+    return int(timeSecs.total_seconds())
+
 
 def do_a_whimsy():
     """Prints an ASCII art alligator. It's not that deep."""
@@ -57,15 +82,15 @@ def get_options():
     argparser.add_argument(
         "-b", "--beginning",
         dest="trimBeginning",
-        help="Seconds to trim from the beginning",
+        help="Seconds or HH:MM:SS to trim from the beginning",
         default=0,
-        type=int
+        type=str
     )
     argparser.add_argument(
         "-e", "--end",
         dest="trimEnd",
-        help="Ending timestamp in seconds",
-        type=int
+        help="Ending timestamp in seconds or HH:MM:SS",
+        type=str
     )
     argparser.add_argument(
         "--whimsy",
@@ -104,9 +129,6 @@ def validate_times(trimBeginning, trimEnd, lastTimestamp):
     elif lastTimestamp <= trimBeginning * 1000:
         print("The end time can't be less than the start time. What are you doing?")
         sys.exit(1)
-    elif trimBeginning < 0 or lastTimestamp <= 0:
-        print("I am not Huey Lewis, I cannot go back in time.")
-        sys.exit(1)
 
 
 def main():
@@ -134,18 +156,22 @@ def main():
         print(f"Unicdode error for {options.inputFile}. Is this a vtt file?")
         sys.exit(1)
 
+    trimBeginning = time_to_secs(options.trimBeginning)
     # If we're chomping off the end, just use the value provided.
     # If we're not chomping off the end, use the final timestamp as the
     # comparison point for chomping.
     if options.trimEnd:
-        lastTimestamp = options.trimEnd * 1000
+        trimEnd = time_to_secs(options.trimEnd)
+        lastTimestamp = trimEnd * 1000
     else:
         lastTimestamp = timestamp_to_ms(inVtt.captions[-1].end)
+        # We still need to define trimEnd to make validate_times happy
+        trimEnd = options.trimEnd
 
-    validate_times(options.trimBeginning, options.trimEnd, lastTimestamp)
+    validate_times(trimBeginning, trimEnd, lastTimestamp)
 
     # Do the chomping!
-    outVtt = chomp_it(inVtt, options.trimBeginning * 1000, lastTimestamp)
+    outVtt = chomp_it(inVtt, trimBeginning * 1000, lastTimestamp)
 
     try:
         outVtt.save(options.outputFile)
