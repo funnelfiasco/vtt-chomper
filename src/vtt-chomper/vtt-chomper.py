@@ -94,6 +94,21 @@ def chomp_it(inVtt,firstTimestamp, lastTimestamp):
 
     return outVtt
 
+def validate_times(trimBeginning, trimEnd, lastTimestamp):
+    '''Make sure the times that the user specified are reasonable.'''
+
+    # If both trims are zero, what exactly is it that you want me to do here?
+    if trimEnd and trimBeginning == trimEnd:
+        print("No trimming requested. That was easy!")
+        sys.exit(1)
+    elif lastTimestamp <= trimBeginning * 1000:
+        print("The end time can't be less than the start time. What are you doing?")
+        sys.exit(1)
+    elif trimBeginning < 0 or lastTimestamp <= 0:
+        print("I am not Huey Lewis, I cannot go back in time.")
+        sys.exit(1)
+
+
 def main():
     '''This is where the magic happens.'''
 
@@ -127,16 +142,7 @@ def main():
     else:
         lastTimestamp = timestamp_to_ms(inVtt.captions[-1].end)
 
-    # If both trims are zero, what exactly is it that you want me to do here?
-    if options.trimEnd and options.trimBeginning == options.trimEnd:
-        print("No trimming requested. That was easy!")
-        sys.exit(1)
-    elif lastTimestamp <= options.trimBeginning * 1000:
-        print("The end time can't be less than the start time. What are you doing?")
-        sys.exit(1)
-    elif options.trimBeginning < 0 or lastTimestamp <= 0:
-        print("I am not Huey Lewis, I cannot go back in time.")
-        sys.exit(1)
+    validate_times(options.trimBeginning, options.trimEnd, lastTimestamp)
 
     # Do the chomping!
     outVtt = chomp_it(inVtt, options.trimBeginning * 1000, lastTimestamp)
