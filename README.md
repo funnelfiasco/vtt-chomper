@@ -8,6 +8,7 @@ Uploading a meeting video and want to get rid of the first 5 minutes where you'r
 Use the `-b <SECONDS>` argument to chomp that many seconds off the beginning of the VTT file and update the time stamps accordingly.
 Want to trim off the end where everyone's just awkwardly saying goodbye to each other?
 use the `-e <SECONDS>` argument to chomp beyond that timestamp in the VTT file.
+If you don't want to do the math to get the number of seconds, you can use `-b` and `-e` with `HH:MM:SS` (hours:minutes:seconds) format.
 Very tasty!
 
 ## Requirements
