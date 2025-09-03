@@ -25,6 +25,8 @@ This project is licensed under the [GNU General Public License 3.0](LICENSE) or 
 
 ## Contributing
 
-I'll accept contributions if you want.
+[![Feature Complete](https://psas.dev/feature-complete/badge.svg)](https://psas.dev/feature-complete)
+
+This is feature complete for my use cases.
+I'll accept contributions for other use cases if it seems maintainable by me.
 All contributions are accepted under the project's license.
-More to come if this is worth actively developing.
