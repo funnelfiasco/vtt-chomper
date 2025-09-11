@@ -1,3 +1,5 @@
+[![Kusari Inspector](https://img.shields.io/badge/Kusari%20Inspector-enabled-8530d1)](https://kusari.dev/inspector)
+
 # vtt-chomper
 
 A simple tool for chomping the ends of a VTT file.
